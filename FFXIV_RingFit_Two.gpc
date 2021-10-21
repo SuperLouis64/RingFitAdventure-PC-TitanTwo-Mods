@@ -1,0 +1,147 @@
+#pragma METAINFO("FFXIV_RingFit_v2", 1, 0, "SuperLouis64")
+#include <keyboard.gph>
+
+/* redesigning the Ring fit for FFXIV
+
+Controller support for FFXIV!
+Squat activates D-PAD 
+RT = R button on joycon
+LT = ZR button on joycon
+ 
+this version is run = run forward
+*/ 
+ 
+int runCheck;
+int isRunning;
+int canRun;
+
+init
+{
+	keymapping(); // Disable default keyboard mappings
+	remapper_swap(BUTTON_8, BUTTON_4); // swap LT and R button
+	
+	runCheck = 0;
+	canRun = 1;
+}
+
+
+main 
+{
+
+// turn off D-Pad 
+//	set_val(BUTTON_10, 0.0);
+//	set_val(BUTTON_11, 0.0);
+//	set_val(BUTTON_12, 0.0);
+//	set_val(BUTTON_13, 0.0);
+
+
+
+set_val(BUTTON_7, 0.0);
+// this program deals with checking runs, explained after main()
+	nowRunning();
+	JoyConDrift(); // pay $80 to fix your joycon drift
+
+	
+
+		
+	if(runCheck > 60)
+		{		
+			if(canRun == 1)
+				{
+					set_val(STICK_2_Y, -100.0); // Run to move forwad
+				}
+		}
+
+
+
+// Let's make squat do d-pad down
+// We need to check both ACCEL Z and Y
+		
+if(get_val(BUTTON_5) == 100.0) // press ZR
+		{
+			// change the -22.00 to a value that works for squatting
+			if(get_val(ACCEL_1_Z) < -22.00) // check squat is happening and press Down D-pad				
+				{
+						{
+							set_val(BUTTON_11, 100.0);
+						}
+				}
+			else
+				{
+					set_val(BUTTON_11, 0.0);
+				}	
+		}
+
+if(get_val(BUTTON_8) == 100.0) // press R (which is LT now)
+		{
+			
+			if(get_val(ACCEL_1_Z) < -22.00) // check squat is happening and press Down D-pad
+				{
+						{
+							set_val(BUTTON_11, 100.0);
+						}
+					 
+				}
+			else
+				{
+					set_val(BUTTON_11, 0.0);
+				}	
+		}
+
+///// disable running when attempting to use actions /////
+if(get_val(BUTTON_5) > 0.0 || get_val(BUTTON_8) > 0.0)
+	{
+		canRun = 0; 
+	}
+	
+if(get_val(BUTTON_5) < 100.0)
+	{
+		if(get_val(BUTTON_8) < 100.0)
+			{
+				canRun = 1;
+			}
+	}
+
+
+//debug();
+
+}
+
+
+// slap together code to determine when user is running
+
+void nowRunning()
+{
+	if(get_val(ACCEL_1_Y) < -30.6)
+		{
+			runCheck = 100;	
+				
+		}
+	if(get_val(ACCEL_1_Y) < -23.8 && get_val(ACCEL_1_Y) > -24.6)
+		{
+			runCheck--;
+		}
+
+}
+
+void JoyConDrift()
+{
+	
+	if(get_val(STICK_2_X) < 20.0 && get_val(STICK_2_X) > - 20.0)
+		{
+			set_val(STICK_2_X, 0.0);
+		}
+		
+	if(get_val(STICK_2_Y) < 20.0 && get_val(STICK_2_Y) > - 20.0)
+		{
+			set_val(STICK_2_Y, 0.0);
+		}
+
+}
+
+// debug check for my runCheck
+void debug()
+{
+	printf("%d", isRunning);
+	
+}

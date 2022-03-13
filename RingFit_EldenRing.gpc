@@ -1,0 +1,197 @@
+#pragma METAINFO("RingFit_Elden", 1, 0, "SuperLouis64")
+
+/* 
+How the mod works:
+- Joystick is locked behind moving
+- All face buttons still work (everything can be remapped in Dark Souls with no issues)
+- Squat to use items!
+*/
+
+
+bool controllerON;
+bool isRunning;
+bool isSquat;
+int runCheck; // Variable to see if the User is running
+
+init 
+{
+
+/* 
+swap the leg joycon's joystick with the ringcon joystick, allows user to
+move with the ringcon joystick and use the camera on their leg
+*/	
+	remapper_swap(STICK_2_X, STICK_1_X);
+	remapper_swap(STICK_2_Y, STICK_1_Y);
+	
+	remapper_swap(BUTTON_15, BUTTON_5);
+	runCheck = 0;
+	
+	controllerON = FALSE;
+	isRunning = FALSE;
+}
+
+main
+{
+
+	fixDrift();
+	nowRunning(); // run the function found below main()
+	
+//Lock the joystick behind running
+	if(runCheck < 50) // the higher the magic number, the harder you need keep up in pace
+		{
+			set_val(STICK_2_X, 0.0);
+			set_val(STICK_2_Y, 0.0);
+		}	
+
+	// resets variable if it goes under 0
+	if(runCheck <0)
+		{
+			runCheck = 0;
+		}
+
+
+	if(get_val(BUTTON_4) > 0.0)
+		{
+			set_val(BUTTON_4, 0.0);
+			set_val(BUTTON_7, 100.0); 
+		}
+		
+	if(get_val(BUTTON_18) > 0.0)
+		{
+			set_val(BUTTON_18, 0.0);
+			set_val(BUTTON_1, 0.0); 
+		}
+
+	if(get_val(BUTTON_6) > 0.0)
+		{
+			set_val(BUTTON_6, 0.0); 
+		}
+
+
+	if(get_val(BUTTON_1) > 0.0)
+		{
+			set_val(BUTTON_1, 0.0);
+			set_val(BUTTON_6, 100.0); 
+		}
+
+
+  if(get_val(BUTTON_17) > 0.0) // turns off the "Xbox button"
+		{
+			if(get_val(ACCEL_1_Z) > -20.00)
+				{
+					set_val(BUTTON_17, 0.0);
+				}
+		}
+
+/* Squat Healing/item
+Squat and press the HOME button to use item.
+Current method: my squat value is ACCEL_1_Z being less than -14.00.
+
+//// IF THIS DOESNT WORK ////
+Look in the Device Monitor tab and see what your ACCEL_1_Z value is when popping a squat.
+Replace the magic number "-14.00" with that value.
+Remember: the face buttons haven't changed so you can use items normally
+	
+*/
+	if(get_val(ACCEL_1_Z) < -20.00 && get_val(BUTTON_17) == 100.0)
+		{
+			set_val(BUTTON_1, 0.0);
+			set_val(BUTTON_17, 100.0);
+		}
+		
+
+/* if you want to turn off D-pad so it doesn't be messed with on the legstrap		
+un-comment section out if you want control of your D-pad
+	
+set_val(BUTTON_10, 0.0);
+set_val(BUTTON_11, 0.0);
+set_val(BUTTON_12, 0.0);
+set_val(BUTTON_13, 0.0);
+*/
+
+/*	
+Below is terrible way to determine if ringcon is squeezed. 
+Titan Two doesn't grab the flex sensor.
+However this is what I got from the ringcon to squeeze to attack with R1
+You can also do this without the ringcon, just punch and it should do the same input
+Remember: R on the joycon still activates R1 in-game
+*/
+	if(get_val(ACCEL_2_X) < -25.0)
+		{
+			set_val(BUTTON_4, 100.0); // Press R1 by squeezing
+		}		
+
+
+
+// swing to attake(noringcon)
+	if(get_val(GYRO_1_Z) < -80.0)
+		{
+			set_val(BUTTON_4, 100.0);
+			//set_val(BUTTON_15, 0.0);
+		}
+		
+// swing with ringcon
+	if(get_val(GYRO_1_X) > 50.0)
+		{
+			set_val(BUTTON_4, 100.0);
+		}
+
+//debug();
+
+}
+
+
+void nowRunning()
+{
+/*
+	Quick explanation for how my duct-tape run checks are done
+	Whenever you "run" my program sets the variable to runCheck = 100
+	every tick, the variable is reduced by --1
+	This way there isn't an immediate loss of movement in-game 
+	There are definitely better way to do this with better math
+	Plans to update this later on!
+*/
+	
+	if(get_val(ACCEL_1_Y) < -30.6)
+		{
+			runCheck = 100;	
+				
+		}
+	if(get_val(ACCEL_1_Y) < -23.8 && get_val(ACCEL_1_Y) > -24.6)
+		{
+			runCheck--;
+		}
+
+}
+
+void fixDrift()
+{
+	/* this if statement below stops my joycon drift... thanks nintendo
+	it will not affect your camera movement */
+	if(get_val(STICK_1_X) > -20.0 && get_val(STICK_1_X) < 20.0)
+		{
+			set_val(STICK_1_X, 0.0);
+		}
+	
+	if(get_val(STICK_1_Y) > -20.0 && get_val(STICK_1_Y) < 20.0)
+		{
+			set_val(STICK_1_Y, 0.0);
+		}
+		
+	if(get_val(STICK_2_X) > -20.0 && get_val(STICK_2_X) < 20.0)
+		{
+			set_val(STICK_2_X, 0.0);
+		}
+		
+	if(get_val(STICK_2_Y) > -20.0 && get_val(STICK_2_Y) < 20.0)
+		{
+			set_val(STICK_2_Y, 0.0);
+		}
+}
+
+void debug() // debug check for my runCheck
+{
+	printf("%d", runCheck);
+	
+}
+	

@@ -41,4 +41,4 @@ I have a more in-depth way to set-up these mods on my [Dark Souls X Ring Fit Pag
 - A: At the moment no. I'm staring to work on an Arduino version that will significantly reduce the cost of the mod and provide more room to work with! As of writing this Readme file, there is no other way to play games with the ring fit adventure mod that is as plug-and-play and easy to use. There are other really cool ways to do this that require drivers, multiple softwares running at the same time, and in some cases 3D printing and making your hardware. My goal is to make it as easy as possible to do this so anyone at any level can do this. I want my Arduino version to do the same thing!
 
 - Q: Can I use/mod/update this for my projects!
-- A: Yeah dude! Just credit me!
+- A: Yeah! If this ends up making you money or content that makes money please hit me up! Just keep in mind that a ton of time and work goes into this and don't be a jerk about stealing content. 
